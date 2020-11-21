@@ -1,50 +1,43 @@
 import { ConfigService } from './../../services/config.service';
-import { AfterViewInit, ViewChild, Component } from '@angular/core';
+import { AfterViewInit, ViewChild, Component, OnInit } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
+import { ApiData } from './../../models/array';
 
-// export interface ApiData {
-//   tags;
-//   owner;
-//   is_answered: boolean;
-//   view_count: number;
-//   answer_count: number;
-//   score: number;
-//   last_activity_date: string;
-//   creation_date: string;
-//   question_id: number;
-//   content_license: string;
-//   link: string;
-//   title: string;
+// export interface PeriodicElement {
+//   name: string;
+//   position: number;
+//   weight: number;
+//   symbol: string;
 // }
-export interface PeriodicElement {
-  name: string;
-  position: number;
-  weight: number;
-  symbol: string;
-}
 
-// { position: 1, name: 'Hydrogen', weight: 1.0079, symbol: 'H' },
+// const ELEMENT_DATA: PeriodicElement[] = [
+//   { position: 1, name: 'Hydrogen', weight: 1.0079, symbol: 'H' },
+// ];
 
-const ELEMENT_DATA: PeriodicElement[] = [
-  { position: 1, name: 'Hydrogen', weight: 1.0079, symbol: 'H' },
-];
 @Component({
   selector: 'app-search',
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],
 })
-export class SearchComponent implements AfterViewInit {
+export class SearchComponent implements AfterViewInit, OnInit {
+  public arrayData: ApiData[]= [];
   constructor(private service: ConfigService) {}
   @ViewChild(MatPaginator) paginator: MatPaginator;
-  // ELEMENT_DATA: ApiData[] = this.service.getPosts();
+
+  ngOnInit() {
+    this.service.getPosts().subscribe((data) => (this.arrayData = data));
+    console.log(this.arrayData);
+  }
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
   }
 
   displayedColumns: string[] = ['position', 'name', 'weight', 'symbol'];
-  dataSource = new MatTableDataSource(ELEMENT_DATA);
+  // displayedColumns: string[] = ['tags', 'owner', 'is_answered', 'view_count', 'answer_count', 'score', 'last_activity_date', 'creation_date', 'question_id', 'content_license','link', 'title'];
+
+  dataSource = new MatTableDataSource(this.arrayData);
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
